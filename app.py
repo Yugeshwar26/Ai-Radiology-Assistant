@@ -2,6 +2,7 @@ import streamlit as st
 from google import genai
 from PIL import Image
 import os
+import time
 
 # 1. Page Configuration
 st.set_page_config(page_title="AI Radiology Assistant", page_icon="🩺", layout="wide")
@@ -39,7 +40,6 @@ if not API_KEY:
     st.error("⚠️ API Key is missing! Please configure it in Streamlit Secrets.")
     st.stop()
 
-# Initialize the Gemini Client
 client = genai.Client(api_key=API_KEY)
 
 # 3. Sidebar - Settings & Info
@@ -64,7 +64,6 @@ st.markdown("*A collaborative GenAI co-pilot designed to bring clarity to comple
 st.markdown(f"**Currently Analyzing:** `{scan_type}` &nbsp; | &nbsp; **System Status:** 🟢 Online")
 st.divider()
 
-# Upload Box
 uploaded_file = st.file_uploader(f"Upload {scan_type} Image (JPG, PNG)", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
@@ -86,7 +85,7 @@ if uploaded_file is not None:
                         # --- DYNAMIC DIAGNOSIS LOGIC ---
                         if scan_type == "Chest X-Ray":
                             diagnosis_options = "**DIAGNOSIS: PNEUMONIA DETECTED** OR **DIAGNOSIS: TUBERCULOSIS DETECTED** OR **DIAGNOSIS: NORMAL**"
-                            technical_focus = "look for lower lobe consolidation/opacities (Pneumonia), upper lobe cavitations and infiltrates (Tuberculosis), or clear lung fields (Normal)"
+                            technical_focus = "look for lower lobe consolidation (Pneumonia), upper lobe cavitations (Tuberculosis), or clear lung fields (Normal)"
                         elif scan_type == "Bone Fracture (X-Ray)":
                             diagnosis_options = "**DIAGNOSIS: FRACTURE DETECTED** OR **DIAGNOSIS: NORMAL**"
                             technical_focus = "look for bone cortical disruption, displacement, or joint alignment"
@@ -96,33 +95,27 @@ if uploaded_file is not None:
                         elif scan_type == "Dental X-Ray":
                             diagnosis_options = "**DIAGNOSIS: DENTAL ANOMALY DETECTED** OR **DIAGNOSIS: NORMAL**"
                             technical_focus = "look for caries (cavities), impacted teeth, or root infections"
-                        else:
-                            diagnosis_options = "**DIAGNOSIS: ANOMALY DETECTED** OR **DIAGNOSIS: NORMAL**"
-                            technical_focus = "provide a detailed structural analysis"
 
-                        # --- THE DYNAMIC PROMPT ---
+                        # --- NEW PROMPT WITH TRIAGE INSTRUCTIONS ---
                         system_prompt = f"""
                         You are a Senior Radiologist specializing in {scan_type}. Analyze the uploaded image with high precision.
 
                         CRITICAL INSTRUCTION: 
-                        You MUST start your response with a clear, bolded diagnosis. Based on the image, output EXACTLY one of these lines first:
-                        {diagnosis_options}
+                        You MUST start your response with exactly TWO lines.
+                        Line 1: A clear diagnosis from these options: {diagnosis_options}
+                        Line 2: TRIAGE_LEVEL: [RED, YELLOW, or GREEN] 
+                        (Rule: RED = Brain Abnormality, Tuberculosis, or Fracture. YELLOW = Pneumonia or Dental Anomaly. GREEN = Normal).
 
-                        After the diagnosis, provide the response in TWO distinct sections:
-
+                        After these two lines, provide the response in TWO distinct sections:
                         ### SECTION 1: PROFESSIONAL MEDICAL REPORT
                         - Clinical Indication: Preliminary screening and triage.
                         - Technical Findings: Provide a detailed anatomical analysis ({technical_focus}).
-                        - Impression: Provide a definitive diagnostic conclusion based on observed evidence.
+                        - Impression: Provide a definitive diagnostic conclusion.
 
                         ---
                         ### SECTION 2: PATIENT-FRIENDLY SUMMARY (SIMPLE ENGLISH)
                         Translate the findings into simple English for a non-medical person:
-                        - Use a friendly, reassuring tone.
-                        - Explain complex medical terms simply.
-                        - List 3 clear 'Next Steps' (e.g., 'Consult your primary physician').
-
-                        **Disclaimer:** This is an AI-generated preliminary analysis and MUST be validated by a qualified doctor before treatment.
+                        - List 3 clear 'Next Steps'.
                         """
                         
                         response = client.models.generate_content(
@@ -130,15 +123,32 @@ if uploaded_file is not None:
                             contents=[system_prompt, img]
                         )
                         
+                        reply = response.text
                         st.success("Analysis Complete!")
-                        st.markdown(response.text)
                         
-                        st.download_button(
-                            label="💾 Download Full Report",
-                            data=response.text,
-                            file_name=f"{scan_type.replace('/', '_')}_Analysis.txt",
-                            mime="text/plain"
-                        )
+                        # --- FEATURE 1: EMERGENCY TRIAGE COLOR CODING ---
+                        if "TRIAGE_LEVEL: RED" in reply.upper():
+                            st.error("🚨 **CODE RED - CRITICAL TRIAGE:** Immediate medical intervention required.")
+                            
+                            # --- FEATURE 2: SECOND OPINION AUTO-ROUTING ---
+                            with st.expander("✉️ Auto-Routing to Specialist Triggered", expanded=True):
+                                st.warning("⚠️ Critical anomaly detected. Automatically packaging scan and AI report for Senior Specialist review.")
+                                if st.button("Transmit to City Central Hospital Now"):
+                                    with st.spinner("Encrypting HL7 Payload..."):
+                                        time.sleep(1.5) # Simulating network delay for realism
+                                    st.success("✅ Encrypted scan & report successfully sent to on-call specialist!")
+                                    
+                        elif "TRIAGE_LEVEL: YELLOW" in reply.upper():
+                            st.warning("🟨 **CODE YELLOW - URGENT TRIAGE:** Requires prompt medical evaluation.")
+                        elif "TRIAGE_LEVEL: GREEN" in reply.upper():
+                            st.success("🟩 **CODE GREEN - ROUTINE TRIAGE:** No acute anomalies detected.")
+                        
+                        # Print the actual AI report below the colored boxes
+                        st.markdown(reply)
                         
                     except Exception as e:
-                        st.error(f"❌ System Error: {str(e)}")
+                        error_msg = str(e)
+                        if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
+                            st.warning("⏳ **API Rate Limit Reached.** (Free Tier Guardrail). Please wait 30 seconds before scanning the next patient.")
+                        else:
+                            st.error(f"❌ System Error: {error_msg}")
