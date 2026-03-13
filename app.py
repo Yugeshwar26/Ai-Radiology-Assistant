@@ -30,9 +30,9 @@ with st.sidebar:
     st.info("Industrial-grade screening tool using Gemini 2.5 Flash for diagnostic assistance.")
     st.markdown("---")
     st.markdown("### Developed by:")
-    st.markdown("**Yugeshwar P.**")
-    st.markdown("**Visvesh M.**")
-    st.markdown("**Matheshwaran S.**")
+    st.markdown("**Yugeshwar P**")
+    st.markdown("**Visvesh M**")
+    st.markdown("**Matheshwaran S**")
     st.markdown("CSE Students")
 
 # 4. Main Dashboard UI
