@@ -7,7 +7,7 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="AI Radiology Assistant", page_icon="🩺", layout="wide", initial_sidebar_state="expanded")
 
-# 2. CLEAN SAAS UI CSS INJECTION
+# 2. CLEAN SAAS UI CSS INJECTION (With text color fix)
 st.markdown("""
     <style>
     /* Clean, modern typography */
@@ -90,6 +90,11 @@ st.markdown("""
     /* Clean Divider */
     hr {
         border-top: 1px solid #E2E8F0;
+    }
+
+    /* FIX: Make warning and error box text visible */
+    [data-testid="stAlert"] div, [data-testid="stAlert"] p {
+        color: #0F172A !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -210,6 +215,6 @@ if uploaded_file is not None:
                     except Exception as e:
                         error_msg = str(e)
                         if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
-                            st.warning("⏳ **System pausing to prevent overload.** Please try again in 30 seconds.")
+                            st.warning("⏳ **System pausing to prevent overload.** Please try again in 60 seconds.")
                         else:
                             st.error(f"❌ System Error: {error_msg}")
