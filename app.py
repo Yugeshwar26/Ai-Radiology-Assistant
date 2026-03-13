@@ -7,7 +7,7 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="AI Radiology Assistant", page_icon="🩺", layout="wide", initial_sidebar_state="expanded")
 
-# 2. CLEAN SAAS UI CSS INJECTION (With text color fix)
+# 2. CLEAN SAAS UI CSS INJECTION (With Report Text Visibility Fix)
 st.markdown("""
     <style>
     /* Clean, modern typography */
@@ -15,7 +15,6 @@ st.markdown("""
     
     html, body, [class*="css"]  {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        color: #1E293B; /* Soft dark slate for text readability */
     }
 
     /* Hide Streamlit Branding */
@@ -35,7 +34,7 @@ st.markdown("""
         box-shadow: 2px 0 10px rgba(0,0,0,0.02);
     }
 
-    /* White Cards with Soft Shadows (Human-made feel) */
+    /* White Cards with Soft Shadows */
     [data-testid="stVerticalBlockBorderWrapper"] {
         background: #FFFFFF !important;
         border: 1px solid #E2E8F0 !important;
@@ -43,10 +42,6 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
         padding: 20px;
         transition: transform 0.2s ease;
-    }
-    [data-testid="stVerticalBlockBorderWrapper"]:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
     }
 
     /* Friendly File Uploader */
@@ -67,7 +62,7 @@ st.markdown("""
         background-color: #2563EB;
         color: white;
         border: none;
-        border-radius: 50px; /* Pill shape is very modern */
+        border-radius: 50px;
         padding: 12px 28px;
         font-weight: 600;
         letter-spacing: 0.5px;
@@ -87,14 +82,23 @@ st.markdown("""
         font-weight: 700;
     }
     
+    /* FIX 1: Make warning/error box text visible */
+    [data-testid="stAlert"] div, [data-testid="stAlert"] p {
+        color: #0F172A !important;
+    }
+
+    /* FIX 2: FORCE AI REPORT TEXT TO BE DARK AND VISIBLE */
+    [data-testid="stMarkdownContainer"] p, 
+    [data-testid="stMarkdownContainer"] li,
+    [data-testid="stMarkdownContainer"] strong {
+        color: #1E293B !important; 
+        font-size: 1.05em;
+        line-height: 1.6;
+    }
+    
     /* Clean Divider */
     hr {
         border-top: 1px solid #E2E8F0;
-    }
-
-    /* FIX: Make warning and error box text visible */
-    [data-testid="stAlert"] div, [data-testid="stAlert"] p {
-        color: #0F172A !important;
     }
     </style>
 """, unsafe_allow_html=True)
