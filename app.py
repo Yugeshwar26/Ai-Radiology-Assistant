@@ -26,7 +26,12 @@ with st.sidebar:
         "Select Type of Radiology Scan",
         ["Chest X-Ray", "Bone Fracture (X-Ray)", "Brain CT/MRI", "Dental X-Ray"]
     )
-    st.info("This tool uses GenAI to assist in preliminary screening. It is not a final diagnosis.")
+    st.divider()
+    st.info("Industrial-grade screening tool using Gemini 2.5 Flash for diagnostic assistance.")
+    st.markdown("---")
+    st.markdown("### Developed by:")
+    st.markdown("**Yugeshwar P.**")
+    st.markdown("CSE Student, Kamaraj College")
 
 # 4. Main Dashboard UI
 st.title("🩺 AI Radiology Assistant (GenAI)")
@@ -42,6 +47,7 @@ if uploaded_file is not None:
     
     with col1:
         st.subheader("📷 Uploaded Scan")
+        # RGB CONVERSION FIX: Crucial for avoiding 'unsupported mode' errors
         img = Image.open(uploaded_file).convert("RGB")
         st.image(img, use_container_width=True, caption=f"Patient {scan_type}")
         
@@ -49,42 +55,41 @@ if uploaded_file is not None:
         st.subheader("📝 AI-Generated Analysis")
         
         if st.button(f"Generate {scan_type} Report", type="primary", use_container_width=True):
-            with st.spinner("Analyzing image..."):
+            with st.spinner("AI is analyzing anatomical features..."):
                 try:
-                    # UPDATED DUAL-MODE PROMPT
+                    # UPDATED EXPERT DUAL-MODE PROMPT
                     system_prompt = f"""
-                    You are an expert radiologist. Analyze this {scan_type} and provide a response with TWO distinct sections:
+                    You are a Senior Radiologist specializing in {scan_type}. Analyze the uploaded image with high precision.
 
                     ### SECTION 1: PROFESSIONAL MEDICAL REPORT
-                    Provide a formal, structured medical report including:
-                    - Clinical Indication
-                    - Technical Findings (detailed anatomical analysis)
-                    - Impression (Diagnostic conclusion)
+                    - Clinical Indication: Preliminary screening and triage.
+                    - Technical Findings: Provide a detailed anatomical analysis (e.g., look for opacities, fractures, or midline shifts).
+                    - Impression: Provide a definitive diagnostic conclusion based on observed evidence.
 
                     ---
                     ### SECTION 2: PATIENT-FRIENDLY SUMMARY (SIMPLE ENGLISH)
-                    Translate the findings above into simple, everyday English for a person with no medical knowledge:
-                    - Use a friendly and reassuring tone.
-                    - Explain complex terms (e.g., instead of 'opacity', use 'cloudy area').
-                    - Provide 3 clear 'Next Steps' for the patient.
+                    Translate the findings into simple English for a non-medical person:
+                    - Use a friendly, reassuring tone.
+                    - Explain terms (e.g., use 'cloudy areas' instead of 'opacities').
+                    - List 3 clear 'Next Steps' (e.g., 'Consult your primary physician').
 
-                    **Disclaimer:** This is an AI-generated preliminary analysis and MUST be validated by a qualified doctor.
+                    **Disclaimer:** This is an AI-generated preliminary analysis and MUST be validated by a qualified doctor before treatment.
                     """
                     
-                    # Call Gemini 2.5 Flash
+                    # Using Gemini 2.5 Flash for the fastest, most accurate results
                     response = client.models.generate_content(
                         model='gemini-2.5-flash',
                         contents=[system_prompt, img]
                     )
                     
-                    st.success("Report Generated Successfully!")
+                    st.success("Analysis Complete!")
                     st.markdown(response.text)
                     
                     # Download Button for the Report
                     st.download_button(
-                        label="Download Report as Text",
+                        label="💾 Download Full Report",
                         data=response.text,
-                        file_name=f"{scan_type}_Report.txt",
+                        file_name=f"{scan_type}_Analysis.txt",
                         mime="text/plain"
                     )
                     
