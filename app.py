@@ -6,10 +6,9 @@ import os
 # 1. Page Configuration
 st.set_page_config(page_title="AI Radiology Assistant", page_icon="🩺", layout="wide")
 
-# Custom CSS for Industrial UI (Medical Blue Button & Clean Uploader)
+# Custom CSS for Industrial UI
 st.markdown("""
     <style>
-    /* Change the main button to a trustworthy Medical Blue */
     div.stButton > button:first-child {
         background-color: #0066cc;
         color: white;
@@ -22,7 +21,6 @@ st.markdown("""
         background-color: #005bb5;
         transform: translateY(-2px);
     }
-    /* Subtle background for the upload box */
     .stFileUploader {
         background-color: rgba(255,255,255,0.05);
         border-radius: 10px;
@@ -58,11 +56,10 @@ with st.sidebar:
     st.markdown("- **Yugeshwar P.**")
     st.markdown("- **Visvesh M.**")
     st.markdown("- **Matheshwaran S.**")
-    st.markdown("*CSE Students, KCET*")
+    st.markdown("*CSE Students, Kamaraj College of Engineering & Technology*")
 
 # 4. Main Dashboard UI
 st.title("🩺 AI Radiology Assistant")
-# The "Human Touch" Microcopy
 st.markdown("*A collaborative GenAI co-pilot designed to bring clarity to complex medical imaging.*")
 st.markdown(f"**Currently Analyzing:** `{scan_type}` &nbsp; | &nbsp; **System Status:** 🟢 Online")
 st.divider()
@@ -71,53 +68,63 @@ st.divider()
 uploaded_file = st.file_uploader(f"Upload {scan_type} Image (JPG, PNG)", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    # Two-column layout
     col1, col2 = st.columns([1, 1.2])
     
     with col1:
-        # Wrap image in an Industrial Card
         with st.container(border=True):
             st.subheader("📷 Uploaded Scan")
-            # RGB CONVERSION FIX
             img = Image.open(uploaded_file).convert("RGB")
             st.image(img, use_container_width=True, caption=f"Patient {scan_type}")
         
     with col2:
-        # Wrap AI Analysis in an Industrial Card
         with st.container(border=True):
             st.subheader("📝 AI-Generated Analysis")
             
-            # Updated professional button text
             if st.button(f"🔍 Analyze Scan & Generate Report", use_container_width=True):
-                with st.spinner("AI is analyzing anatomical features..."):
+                with st.spinner(f"AI is analyzing {scan_type} features..."):
                     try:
-                        # UPDATED EXPERT DUAL-MODE PROMPT WITH FORCED EXACT DIAGNOSIS
+                        # --- DYNAMIC DIAGNOSIS LOGIC ---
+                        if scan_type == "Chest X-Ray":
+                            diagnosis_options = "**DIAGNOSIS: PNEUMONIA DETECTED** OR **DIAGNOSIS: TUBERCULOSIS DETECTED** OR **DIAGNOSIS: NORMAL**"
+                            technical_focus = "look for lower lobe consolidation/opacities (Pneumonia), upper lobe cavitations and infiltrates (Tuberculosis), or clear lung fields (Normal)"
+                        elif scan_type == "Bone Fracture (X-Ray)":
+                            diagnosis_options = "**DIAGNOSIS: FRACTURE DETECTED** OR **DIAGNOSIS: NORMAL**"
+                            technical_focus = "look for bone cortical disruption, displacement, or joint alignment"
+                        elif scan_type == "Brain CT/MRI":
+                            diagnosis_options = "**DIAGNOSIS: ABNORMALITY DETECTED** OR **DIAGNOSIS: NORMAL**"
+                            technical_focus = "look for intracranial hemorrhage, mass effect, tumors, or midline shift"
+                        elif scan_type == "Dental X-Ray":
+                            diagnosis_options = "**DIAGNOSIS: DENTAL ANOMALY DETECTED** OR **DIAGNOSIS: NORMAL**"
+                            technical_focus = "look for caries (cavities), impacted teeth, or root infections"
+                        else:
+                            diagnosis_options = "**DIAGNOSIS: ANOMALY DETECTED** OR **DIAGNOSIS: NORMAL**"
+                            technical_focus = "provide a detailed structural analysis"
+
+                        # --- THE DYNAMIC PROMPT ---
                         system_prompt = f"""
                         You are a Senior Radiologist specializing in {scan_type}. Analyze the uploaded image with high precision.
 
                         CRITICAL INSTRUCTION: 
-                        You MUST start your response with a clear, bolded diagnosis. Based on the image, output EXACTLY one of these two lines first:
-                        **DIAGNOSIS: PNEUMONIA DETECTED** OR 
-                        **DIAGNOSIS: NORMAL**
+                        You MUST start your response with a clear, bolded diagnosis. Based on the image, output EXACTLY one of these lines first:
+                        {diagnosis_options}
 
                         After the diagnosis, provide the response in TWO distinct sections:
 
                         ### SECTION 1: PROFESSIONAL MEDICAL REPORT
                         - Clinical Indication: Preliminary screening and triage.
-                        - Technical Findings: Provide a detailed anatomical analysis (e.g., look for opacities, fluid, or clear lungs).
+                        - Technical Findings: Provide a detailed anatomical analysis ({technical_focus}).
                         - Impression: Provide a definitive diagnostic conclusion based on observed evidence.
 
                         ---
                         ### SECTION 2: PATIENT-FRIENDLY SUMMARY (SIMPLE ENGLISH)
                         Translate the findings into simple English for a non-medical person:
                         - Use a friendly, reassuring tone.
-                        - Explain terms (e.g., use 'cloudy areas' instead of 'opacities').
+                        - Explain complex medical terms simply.
                         - List 3 clear 'Next Steps' (e.g., 'Consult your primary physician').
 
                         **Disclaimer:** This is an AI-generated preliminary analysis and MUST be validated by a qualified doctor before treatment.
                         """
                         
-                        # Using Gemini 2.5 Flash
                         response = client.models.generate_content(
                             model='gemini-2.5-flash',
                             contents=[system_prompt, img]
@@ -126,11 +133,10 @@ if uploaded_file is not None:
                         st.success("Analysis Complete!")
                         st.markdown(response.text)
                         
-                        # Download Button for the Report
                         st.download_button(
                             label="💾 Download Full Report",
                             data=response.text,
-                            file_name=f"{scan_type}_Analysis.txt",
+                            file_name=f"{scan_type.replace('/', '_')}_Analysis.txt",
                             mime="text/plain"
                         )
                         
