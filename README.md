@@ -1,7 +1,7 @@
 # 🩺 VitalSight AI: The Human-Centric Radiology Co-Pilot
 **Bridging the Gap Between Complex Medical Imaging and Patient Empowerment**
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge.svg)](https://your-app-link.streamlit.app)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge.svg)](https://ai-radiology-assistant-z7ehsuaygsdndscuumtbdq.streamlit.app/)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
 ## 🏥 Project Overview (MEDICATHON PS-4)
