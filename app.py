@@ -6,6 +6,31 @@ import os
 # 1. Page Configuration
 st.set_page_config(page_title="AI Radiology Assistant", page_icon="🩺", layout="wide")
 
+# Custom CSS for Industrial UI (Medical Blue Button & Clean Uploader)
+st.markdown("""
+    <style>
+    /* Change the main button to a trustworthy Medical Blue */
+    div.stButton > button:first-child {
+        background-color: #0066cc;
+        color: white;
+        border-radius: 6px;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease 0s;
+    }
+    div.stButton > button:first-child:hover {
+        background-color: #005bb5;
+        transform: translateY(-2px);
+    }
+    /* Subtle background for the upload box */
+    .stFileUploader {
+        background-color: rgba(255,255,255,0.05);
+        border-radius: 10px;
+        padding: 15px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # 2. Secure API Key Loading
 try:
     API_KEY = st.secrets["GEMINI_API_KEY"]
@@ -30,14 +55,16 @@ with st.sidebar:
     st.info("Industrial-grade screening tool using Gemini 2.5 Flash for diagnostic assistance.")
     st.markdown("---")
     st.markdown("### Developed by:")
-    st.markdown("**Yugeshwar P**")
-    st.markdown("**Visvesh M**")
-    st.markdown("**Matheshwaran S**")
-    st.markdown("CSE Students")
+    st.markdown("- **Yugeshwar P.**")
+    st.markdown("- **Visvesh M.**")
+    st.markdown("- **Matheshwaran S.**")
+    st.markdown("*CSE Students, Kamaraj College*")
 
 # 4. Main Dashboard UI
 st.title("🩺 AI Radiology Assistant")
-st.markdown(f"### Currently Analyzing: {scan_type}")
+# The "Human Touch" Microcopy
+st.markdown("*A collaborative GenAI co-pilot designed to bring clarity to complex medical imaging.*")
+st.markdown(f"**Currently Analyzing:** `{scan_type}` &nbsp; | &nbsp; **System Status:** 🟢 Online")
 st.divider()
 
 # Upload Box
@@ -48,59 +75,64 @@ if uploaded_file is not None:
     col1, col2 = st.columns([1, 1.2])
     
     with col1:
-        st.subheader("📷 Uploaded Scan")
-        # RGB CONVERSION FIX: Crucial for avoiding 'unsupported mode' errors
-        img = Image.open(uploaded_file).convert("RGB")
-        st.image(img, use_container_width=True, caption=f"Patient {scan_type}")
+        # Wrap image in an Industrial Card
+        with st.container(border=True):
+            st.subheader("📷 Uploaded Scan")
+            # RGB CONVERSION FIX
+            img = Image.open(uploaded_file).convert("RGB")
+            st.image(img, use_container_width=True, caption=f"Patient {scan_type}")
         
     with col2:
-        st.subheader("📝 AI-Generated Analysis")
-        
-        if st.button(f"Generate {scan_type} Report", type="primary", use_container_width=True):
-            with st.spinner("AI is analyzing anatomical features..."):
-                try:
-                    # UPDATED EXPERT DUAL-MODE PROMPT WITH FORCED EXACT DIAGNOSIS
-                    system_prompt = f"""
-                    You are a Senior Radiologist specializing in {scan_type}. Analyze the uploaded image with high precision.
+        # Wrap AI Analysis in an Industrial Card
+        with st.container(border=True):
+            st.subheader("📝 AI-Generated Analysis")
+            
+            # Updated professional button text
+            if st.button(f"🔍 Analyze Scan & Generate Report", use_container_width=True):
+                with st.spinner("AI is analyzing anatomical features..."):
+                    try:
+                        # UPDATED EXPERT DUAL-MODE PROMPT WITH FORCED EXACT DIAGNOSIS
+                        system_prompt = f"""
+                        You are a Senior Radiologist specializing in {scan_type}. Analyze the uploaded image with high precision.
 
-                    CRITICAL INSTRUCTION: 
-                    You MUST start your response with a clear, bolded diagnosis. Based on the image, output EXACTLY one of these two lines first:
-                    **DIAGNOSIS: PNEUMONIA DETECTED** OR 
-                    **DIAGNOSIS: NORMAL**
+                        CRITICAL INSTRUCTION: 
+                        You MUST start your response with a clear, bolded diagnosis. Based on the image, output EXACTLY one of these two lines first:
+                        **DIAGNOSIS: PNEUMONIA DETECTED** OR 
+                        **DIAGNOSIS: NORMAL**
 
-                    After the diagnosis, provide the response in TWO distinct sections:
+                        After the diagnosis, provide the response in TWO distinct sections:
 
-                    ### SECTION 1: PROFESSIONAL MEDICAL REPORT
-                    - Clinical Indication: Preliminary screening and triage.
-                    - Technical Findings: Provide a detailed anatomical analysis (e.g., look for opacities, fluid, or clear lungs).
-                    - Impression: Provide a definitive diagnostic conclusion based on observed evidence.
+                        ### SECTION 1: PROFESSIONAL MEDICAL REPORT
+                        - Clinical Indication: Preliminary screening and triage.
+                        - Technical Findings: Provide a detailed anatomical analysis (e.g., look for opacities, fluid, or clear lungs).
+                        - Impression: Provide a definitive diagnostic conclusion based on observed evidence.
 
-                    ---
-                    ### SECTION 2: PATIENT-FRIENDLY SUMMARY (SIMPLE ENGLISH)
-                    Translate the findings into simple English for a non-medical person:
-                    - Use a friendly, reassuring tone.
-                    - Explain terms (e.g., use 'cloudy areas' instead of 'opacities').
-                    - List 3 clear 'Next Steps' (e.g., 'Consult your primary physician').
+                        ---
+                        ### SECTION 2: PATIENT-FRIENDLY SUMMARY (SIMPLE ENGLISH)
+                        Translate the findings into simple English for a non-medical person:
+                        - Use a friendly, reassuring tone.
+                        - Explain terms (e.g., use 'cloudy areas' instead of 'opacities').
+                        - List 3 clear 'Next Steps' (e.g., 'Consult your primary physician').
 
-                    **Disclaimer:** This is an AI-generated preliminary analysis and MUST be validated by a qualified doctor before treatment.
-                    """
-                    
-                    # Using Gemini 2.5 Flash for the fastest, most accurate results on the free tier
-                    response = client.models.generate_content(
-                        model='gemini-2.5-flash',
-                        contents=[system_prompt, img]
-                    )
-                    
-                    st.success("Analysis Complete!")
-                    st.markdown(response.text)
-                    
-                    # Download Button for the Report
-                    st.download_button(
-                        label="💾 Download Full Report",
-                        data=response.text,
-                        file_name=f"{scan_type}_Analysis.txt",
-                        mime="text/plain"
-                    )
-                    
-                except Exception as e:
-                    st.error(f"❌ System Error: {str(e)}")
+                        **Disclaimer:** This is an AI-generated preliminary analysis and MUST be validated by a qualified doctor before treatment.
+                        """
+                        
+                        # Using Gemini 2.5 Flash
+                        response = client.models.generate_content(
+                            model='gemini-2.5-flash',
+                            contents=[system_prompt, img]
+                        )
+                        
+                        st.success("Analysis Complete!")
+                        st.markdown(response.text)
+                        
+                        # Download Button for the Report
+                        st.download_button(
+                            label="💾 Download Full Report",
+                            data=response.text,
+                            file_name=f"{scan_type}_Analysis.txt",
+                            mime="text/plain"
+                        )
+                        
+                    except Exception as e:
+                        st.error(f"❌ System Error: {str(e)}")
