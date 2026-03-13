@@ -31,7 +31,9 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### Developed by:")
     st.markdown("**Yugeshwar P.**")
-    st.markdown("CSE Student")
+    st.markdown("**Visvesh M.**")
+    st.markdown("**Matheshwaran S.**")
+    st.markdown("CSE Students")
 
 # 4. Main Dashboard UI
 st.title("🩺 AI Radiology Assistant")
