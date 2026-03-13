@@ -31,10 +31,10 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### Developed by:")
     st.markdown("**Yugeshwar P.**")
-    st.markdown("CSE Student, Kamaraj College")
+    st.markdown("CSE Student")
 
 # 4. Main Dashboard UI
-st.title("🩺 AI Radiology Assistant (GenAI)")
+st.title("🩺 AI Radiology Assistant")
 st.markdown(f"### Currently Analyzing: {scan_type}")
 st.divider()
 
@@ -57,13 +57,20 @@ if uploaded_file is not None:
         if st.button(f"Generate {scan_type} Report", type="primary", use_container_width=True):
             with st.spinner("AI is analyzing anatomical features..."):
                 try:
-                    # UPDATED EXPERT DUAL-MODE PROMPT
+                    # UPDATED EXPERT DUAL-MODE PROMPT WITH FORCED EXACT DIAGNOSIS
                     system_prompt = f"""
                     You are a Senior Radiologist specializing in {scan_type}. Analyze the uploaded image with high precision.
 
+                    CRITICAL INSTRUCTION: 
+                    You MUST start your response with a clear, bolded diagnosis. Based on the image, output EXACTLY one of these two lines first:
+                    **DIAGNOSIS: PNEUMONIA DETECTED** OR 
+                    **DIAGNOSIS: NORMAL**
+
+                    After the diagnosis, provide the response in TWO distinct sections:
+
                     ### SECTION 1: PROFESSIONAL MEDICAL REPORT
                     - Clinical Indication: Preliminary screening and triage.
-                    - Technical Findings: Provide a detailed anatomical analysis (e.g., look for opacities, fractures, or midline shifts).
+                    - Technical Findings: Provide a detailed anatomical analysis (e.g., look for opacities, fluid, or clear lungs).
                     - Impression: Provide a definitive diagnostic conclusion based on observed evidence.
 
                     ---
@@ -76,7 +83,7 @@ if uploaded_file is not None:
                     **Disclaimer:** This is an AI-generated preliminary analysis and MUST be validated by a qualified doctor before treatment.
                     """
                     
-                    # Using Gemini 2.5 Flash for the fastest, most accurate results
+                    # Using Gemini 2.5 Flash for the fastest, most accurate results on the free tier
                     response = client.models.generate_content(
                         model='gemini-2.5-flash',
                         contents=[system_prompt, img]
