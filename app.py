@@ -58,7 +58,7 @@ with st.sidebar:
     st.markdown("- **Yugeshwar P.**")
     st.markdown("- **Visvesh M.**")
     st.markdown("- **Matheshwaran S.**")
-    st.markdown("*CSE Students, Kamaraj College*")
+    st.markdown("*CSE Students, KCET*")
 
 # 4. Main Dashboard UI
 st.title("🩺 AI Radiology Assistant")
