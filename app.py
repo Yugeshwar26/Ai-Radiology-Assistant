@@ -7,7 +7,7 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="AI Radiology Assistant", page_icon="🩺", layout="wide", initial_sidebar_state="expanded")
 
-# 2. CLEAN SAAS UI CSS INJECTION (With ALL Text Visibility Fixes)
+# 2. CLEAN SAAS UI CSS INJECTION (With the Browse Files Button Fix)
 st.markdown("""
     <style>
     /* Clean, modern typography */
@@ -96,9 +96,19 @@ st.markdown("""
         line-height: 1.6;
     }
     
-    /* FIX 3: Make uploaded file text completely visible */
-    [data-testid="stFileUploader"] * {
+    /* FIX 3: Make uploaded file text visible and fix Browse button */
+    div[data-testid="stFileUploader"] span,
+    div[data-testid="stFileUploader"] small,
+    div[data-testid="stFileUploader"] label {
         color: #0F172A !important;
+    }
+    
+    div[data-testid="stFileUploader"] button {
+        background-color: #2563EB !important;
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        border: none !important;
     }
     
     /* Clean Divider */
