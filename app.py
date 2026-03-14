@@ -7,99 +7,22 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="AI Radiology Assistant", page_icon="🩺", layout="wide", initial_sidebar_state="expanded")
 
-# 2. CLEAN SAAS UI CSS INJECTION (With Report Text Visibility Fix)
+# 2. CLEAN SAAS UI CSS INJECTION 
 st.markdown("""
     <style>
-    /* Clean, modern typography */
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-    
-    html, body, [class*="css"]  {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    /* Hide Streamlit Branding */
-    #MainMenu {visibility: hidden;}
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-
-    /* Light, calming medical background */
-    .stApp {
-        background-color: #F8FAFC;
-    }
-
-    /* Style the Sidebar - Clean White */
-    [data-testid="stSidebar"] {
-        background-color: #FFFFFF;
-        border-right: 1px solid #E2E8F0;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.02);
-    }
-
-    /* White Cards with Soft Shadows */
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        background: #FFFFFF !important;
-        border: 1px solid #E2E8F0 !important;
-        border-radius: 16px !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
-        padding: 20px;
-        transition: transform 0.2s ease;
-    }
-
-    /* Friendly File Uploader */
-    [data-testid="stFileUploadDropzone"] {
-        background-color: #F1F5F9 !important;
-        border: 2px dashed #CBD5E1 !important;
-        border-radius: 16px;
-        padding: 30px !important;
-        transition: all 0.3s ease;
-    }
-    [data-testid="stFileUploadDropzone"]:hover {
-        background-color: #EFF6FF !important;
-        border: 2px dashed #3B82F6 !important;
-    }
-
-    /* Primary Action Button - Soft Pill Shape */
-    div.stButton > button:first-child {
-        background-color: #2563EB;
-        color: white;
-        border: none;
-        border-radius: 50px;
-        padding: 12px 28px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-        transition: all 0.3s ease;
-        width: 100%;
-    }
-    div.stButton > button:first-child:hover {
-        transform: translateY(-2px);
-        background-color: #1D4ED8;
-        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-    }
-
-    /* Section Headers */
-    h1, h2, h3 {
-        color: #0F172A !important;
-        font-weight: 700;
-    }
-    
-    /* FIX 1: Make warning/error box text visible */
-    [data-testid="stAlert"] div, [data-testid="stAlert"] p {
-        color: #0F172A !important;
-    }
-
-    /* FIX 2: FORCE AI REPORT TEXT TO BE DARK AND VISIBLE */
-    [data-testid="stMarkdownContainer"] p, 
-    [data-testid="stMarkdownContainer"] li,
-    [data-testid="stMarkdownContainer"] strong {
-        color: #1E293B !important; 
-        font-size: 1.05em;
-        line-height: 1.6;
-    }
-    
-    /* Clean Divider */
-    hr {
-        border-top: 1px solid #E2E8F0;
-    }
+    html, body, [class*="css"]  { font-family: 'Plus Jakarta Sans', sans-serif; }
+    #MainMenu {visibility: hidden;} header {visibility: hidden;} footer {visibility: hidden;}
+    .stApp { background-color: #F8FAFC; }
+    [data-testid="stSidebar"] { background-color: #FFFFFF; border-right: 1px solid #E2E8F0; box-shadow: 2px 0 10px rgba(0,0,0,0.02); }
+    [data-testid="stVerticalBlockBorderWrapper"] { background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-radius: 16px !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important; padding: 20px; transition: transform 0.2s ease; }
+    [data-testid="stFileUploadDropzone"] { background-color: #F1F5F9 !important; border: 2px dashed #CBD5E1 !important; border-radius: 16px; padding: 30px !important; }
+    div.stButton > button:first-child { background-color: #2563EB; color: white; border: none; border-radius: 50px; padding: 12px 28px; font-weight: 600; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); width: 100%; }
+    div.stButton > button:first-child:hover { background-color: #1D4ED8; transform: translateY(-2px); }
+    h1, h2, h3 { color: #0F172A !important; font-weight: 700; }
+    [data-testid="stAlert"] div, [data-testid="stAlert"] p { color: #0F172A !important; }
+    [data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] li, [data-testid="stMarkdownContainer"] strong { color: #1E293B !important; font-size: 1.05em; line-height: 1.6; }
+    hr { border-top: 1px solid #E2E8F0; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -115,6 +38,43 @@ if not API_KEY:
 
 client = genai.Client(api_key=API_KEY)
 
+# --- HOSPITAL DATABASE MAPPER (Tamil Nadu) ---
+def get_hospital_recommendation(scan_type, district):
+    db = {
+        "Chest X-Ray": {
+            "Chennai": "Rajiv Gandhi Govt General Hospital / Apollo Greams Road (Pulmonology)",
+            "Madurai": "Govt Hospital for Thoracic Medicine (Thoppur) / Meenakshi Mission",
+            "Coimbatore": "GKNM Hospital / Coimbatore Medical College Hospital",
+            "Virudhunagar": "Virudhunagar Govt Medical College Hospital / Velammal Madurai",
+            "Trichy": "Mahatma Gandhi Memorial Govt Hospital / Apollo Specialty"
+        },
+        "Bone Fracture (X-Ray)": {
+            "Chennai": "MIOT International (Level 1 Trauma) / Parvathy Hospital",
+            "Madurai": "Preethi Hospitals (Ortho Spec.) / Velammal Medical College",
+            "Coimbatore": "Ganga Hospital (Renowned Orthopedics & Trauma)",
+            "Virudhunagar": "Virudhunagar Govt Hospital / Preethi Hospitals (Madurai)",
+            "Trichy": "Kauvery Hospital / SRM Medical College"
+        },
+        "Brain CT/MRI": {
+            "Chennai": "Apollo Proton Cancer Centre / NIMHANS Referral / SIMS Hospital",
+            "Madurai": "Meenakshi Mission Hospital (Neurosurgery) / Apollo Madurai",
+            "Coimbatore": "Kovai Medical Center and Hospital (KMCH)",
+            "Virudhunagar": "Meenakshi Mission Madurai (Nearest Neuro Hub)",
+            "Trichy": "Kauvery Hospital (Neurology Dept)"
+        },
+        "Dental X-Ray": {
+            "Chennai": "Saveetha Dental College / Balaji Dental Hospital",
+            "Madurai": "CSI College of Dental Sciences / Vasan Dental Care",
+            "Coimbatore": "Sri Ramakrishna Dental College",
+            "Virudhunagar": "Local District Govt Hospital Dental Wing",
+            "Trichy": "KAPV Govt Medical College Dental Wing"
+        }
+    }
+    
+    # Return specific hospital if district is in our DB, else return the District HQ Hospital
+    return db.get(scan_type, {}).get(district, f"{district} District Government Headquarters Hospital")
+
+
 # 4. Sidebar - Human-Centric Profile
 with st.sidebar:
     st.markdown("## 🩺 Clinic Settings")
@@ -122,9 +82,14 @@ with st.sidebar:
     
     scan_type = st.selectbox(
         "Current Patient Scan Modality",
-        ["Chest X-Ray", "Bone Fracture (X-Ray)", "Brain CT/MRI", "Dental X-Ray"],
-        help="Select the type of scan you are uploading for this patient."
+        ["Chest X-Ray", "Bone Fracture (X-Ray)", "Brain CT/MRI", "Dental X-Ray"]
     )
+    
+    # NEW FEATURE: TN District Selector
+    st.markdown("---")
+    st.markdown("### 📍 Location Triage")
+    tn_districts = ["Chennai", "Madurai", "Coimbatore", "Virudhunagar", "Trichy", "Salem", "Tirunelveli", "Erode", "Vellore", "Kanyakumari", "Other (TN)"]
+    patient_district = st.selectbox("Patient District (Tamil Nadu)", tn_districts)
     
     st.markdown("---")
     st.markdown("### Care Team:")
@@ -135,7 +100,6 @@ with st.sidebar:
 st.markdown("<h1>Radiology Co-Pilot</h1>", unsafe_allow_html=True)
 st.markdown("<p style='color: #64748B; font-size: 1.1em; margin-bottom: 30px;'>Empowering clinical teams with instant, AI-driven diagnostic triage.</p>", unsafe_allow_html=True)
 
-# Upload Box
 uploaded_file = st.file_uploader(f"Drop patient's {scan_type} image here", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
@@ -150,7 +114,6 @@ if uploaded_file is not None:
     with col2:
         with st.container(border=True):
             st.markdown("### ✨ AI Assistant")
-            st.markdown("<p style='color: #64748B; font-size: 0.9em;'>Our multimodal model will scan for critical anomalies.</p>", unsafe_allow_html=True)
             
             if st.button(f"Generate Diagnostic Report"):
                 with st.spinner(f"Reviewing {scan_type}..."):
@@ -198,20 +161,28 @@ if uploaded_file is not None:
                         st.success("✅ Analysis Complete")
                         st.divider()
                         
+                        # GET LOCAL HOSPITAL MATCH
+                        local_hospital = get_hospital_recommendation(scan_type, patient_district)
+                        
                         # TRIAGE & AUTO ROUTING
-                        if "TRIAGE_LEVEL: RED" in reply.upper():
-                            st.error("🚨 **TRIAGE: CRITICAL (CODE RED)** - Immediate medical intervention recommended.")
+                        if "TRIAGE_LEVEL: RED" in reply.upper() or "TRIAGE_LEVEL: YELLOW" in reply.upper():
+                            if "TRIAGE_LEVEL: RED" in reply.upper():
+                                st.error("🚨 **TRIAGE: CRITICAL (CODE RED)** - Immediate medical intervention recommended.")
+                            else:
+                                st.warning("🟨 **TRIAGE: URGENT (CODE YELLOW)** - Prompt medical evaluation needed.")
+                                
+                            # SHOW LOCALIZED HOSPITAL REFERRAL
+                            st.info(f"🏥 **Local Referral System:** Based on the selected district (**{patient_district}**), we recommend transferring the patient to:\n\n**{local_hospital}**")
+                            
                             with st.expander("✉️ Auto-Routing Protocol Triggered", expanded=True):
                                 st.warning("Sending prioritized alert to on-call specialist...")
-                                if st.button("Confirm Transfer"):
+                                if st.button("Confirm Transfer to Referral Hospital"):
                                     with st.spinner("Securing patient data..."):
                                         time.sleep(1.5)
-                                    st.success("✅ Case successfully transferred to Central Hospital.")
+                                    st.success(f"✅ Case successfully transferred to {local_hospital}.")
                                     
-                        elif "TRIAGE_LEVEL: YELLOW" in reply.upper():
-                            st.warning("🟨 **TRIAGE: URGENT (CODE YELLOW)** - Prompt medical evaluation needed.")
                         elif "TRIAGE_LEVEL: GREEN" in reply.upper():
-                            st.success("🟩 **TRIAGE: ROUTINE (CODE GREEN)** - No acute anomalies detected.")
+                            st.success("🟩 **TRIAGE: ROUTINE (CODE GREEN)** - No acute anomalies detected. Standard local clinic care is sufficient.")
                         
                         # Markdown Report
                         st.markdown(reply)
