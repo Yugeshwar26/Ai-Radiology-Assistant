@@ -7,7 +7,7 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="AI Radiology Assistant", page_icon="🩺", layout="wide", initial_sidebar_state="expanded")
 
-# 2. CLEAN SAAS UI CSS INJECTION (With the Ultimate File Uploader Fix)
+# 2. CLEAN SAAS UI CSS INJECTION (With the Ultimate Button Fix)
 st.markdown("""
     <style>
     /* Clean, modern typography */
@@ -66,26 +66,38 @@ st.markdown("""
     
     /* FIX 3: THE ULTIMATE FILE UPLOADER FIX */
     [data-testid="stFileUploadDropzone"] {
-        background-color: #F1F5F9 !important; /* Force light background */
+        background-color: #F1F5F9 !important; 
         border: 2px dashed #94A3B8 !important;
         border-radius: 16px;
         padding: 30px !important;
     }
-    
     [data-testid="stFileUploadDropzone"] * {
-        color: #1E293B !important; /* Force dark text inside the box */
+        color: #1E293B !important; 
     }
-    
     div[data-testid="stFileUploader"] label {
-        color: #0F172A !important; /* The label above the box */
+        color: #0F172A !important; 
     }
     
-    div[data-testid="stFileUploader"] button {
+    /* FIX 4: FORCE ALL BUTTONS AND THEIR TEXT TO BE VISIBLE */
+    div.stButton > button {
         background-color: #2563EB !important;
         color: #FFFFFF !important;
-        font-weight: 600 !important;
-        border-radius: 8px !important;
         border: none !important;
+        border-radius: 50px !important;
+        padding: 12px 28px !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.5px !important;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3) !important;
+        transition: all 0.3s ease !important;
+        width: 100% !important;
+    }
+    div.stButton > button * {
+        color: #FFFFFF !important; /* This forces the text inside to be pure white */
+    }
+    div.stButton > button:hover {
+        transform: translateY(-2px) !important;
+        background-color: #1D4ED8 !important;
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4) !important;
     }
     
     /* Clean Divider */
