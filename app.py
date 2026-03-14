@@ -7,7 +7,7 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="AI Radiology Assistant", page_icon="🩺", layout="wide", initial_sidebar_state="expanded")
 
-# 2. CLEAN SAAS UI CSS INJECTION (With the Browse Files Button Fix)
+# 2. CLEAN SAAS UI CSS INJECTION (With the Ultimate File Uploader Fix)
 st.markdown("""
     <style>
     /* Clean, modern typography */
@@ -44,38 +44,6 @@ st.markdown("""
         transition: transform 0.2s ease;
     }
 
-    /* Friendly File Uploader */
-    [data-testid="stFileUploadDropzone"] {
-        background-color: #F1F5F9 !important;
-        border: 2px dashed #CBD5E1 !important;
-        border-radius: 16px;
-        padding: 30px !important;
-        transition: all 0.3s ease;
-    }
-    [data-testid="stFileUploadDropzone"]:hover {
-        background-color: #EFF6FF !important;
-        border: 2px dashed #3B82F6 !important;
-    }
-
-    /* Primary Action Button - Soft Pill Shape */
-    div.stButton > button:first-child {
-        background-color: #2563EB;
-        color: white;
-        border: none;
-        border-radius: 50px;
-        padding: 12px 28px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-        transition: all 0.3s ease;
-        width: 100%;
-    }
-    div.stButton > button:first-child:hover {
-        transform: translateY(-2px);
-        background-color: #1D4ED8;
-        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-    }
-
     /* Section Headers */
     h1, h2, h3 {
         color: #0F172A !important;
@@ -96,11 +64,20 @@ st.markdown("""
         line-height: 1.6;
     }
     
-    /* FIX 3: Make uploaded file text visible and fix Browse button */
-    div[data-testid="stFileUploader"] span,
-    div[data-testid="stFileUploader"] small,
+    /* FIX 3: THE ULTIMATE FILE UPLOADER FIX */
+    [data-testid="stFileUploadDropzone"] {
+        background-color: #F1F5F9 !important; /* Force light background */
+        border: 2px dashed #94A3B8 !important;
+        border-radius: 16px;
+        padding: 30px !important;
+    }
+    
+    [data-testid="stFileUploadDropzone"] * {
+        color: #1E293B !important; /* Force dark text inside the box */
+    }
+    
     div[data-testid="stFileUploader"] label {
-        color: #0F172A !important;
+        color: #0F172A !important; /* The label above the box */
     }
     
     div[data-testid="stFileUploader"] button {
@@ -257,9 +234,9 @@ if uploaded_file is not None:
                         # TRIAGE & AUTO ROUTING
                         if "TRIAGE_LEVEL: RED" in reply.upper() or "TRIAGE_LEVEL: YELLOW" in reply.upper():
                             if "TRIAGE_LEVEL: RED" in reply.upper():
-                                st.error("🚨 **TRIAGE: CRITICAL (CODE RED)** - Immediate medical intervention recommended.")
+                                st.error("🚨 **TRIAGE: CRITICAL (CODE RED)** - Immediate intervention recommended.")
                             else:
-                                st.warning("🟨 **TRIAGE: URGENT (CODE YELLOW)** - Prompt medical evaluation needed.")
+                                st.warning("🟨 **TRIAGE: URGENT (CODE YELLOW)** - Prompt evaluation needed.")
                                 
                             # SHOW LOCALIZED HOSPITAL REFERRAL
                             st.info(f"🏥 **Local Referral System:** Based on the selected district (**{patient_district}**), we recommend transferring the patient to:\n\n**{local_hospital}**")
