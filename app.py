@@ -7,7 +7,7 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="AI Radiology Assistant", page_icon="🩺", layout="wide", initial_sidebar_state="expanded")
 
-# 2. CLEAN SAAS UI CSS INJECTION (With the Ultimate Button & Cursor Fix)
+# 2. CLEAN SAAS UI CSS INJECTION (With the Ultimate Button, Cursor, and Uploader Fix)
 st.markdown("""
     <style>
     /* Clean, modern typography */
@@ -74,20 +74,29 @@ st.markdown("""
         line-height: 1.6;
     }
     
-    /* FIX 3: THE ULTIMATE FILE UPLOADER FIX */
-    [data-testid="stFileUploadDropzone"] {
-        background-color: #F1F5F9 !important; 
-        border: 2px dashed #94A3B8 !important;
+    /* NEW FIX 6: Darkened File Uploader with Pure White Text (as requested) */
+    div[data-testid="stFileUploader"] {
+        background-color: #212534 !important; /* Dark background from image example */
+        border: 1px solid #4B5563 !important; /* Subtler dark border */
         border-radius: 16px;
-        padding: 30px !important;
-        cursor: pointer !important; /* Keep pointer for dropzone */
+        padding: 15px; /* Closer fit */
+        cursor: pointer !important; 
     }
-    [data-testid="stFileUploadDropzone"] * {
-        color: #1E293B !important; 
+    
+    /* Specific text targeting for the Upload, Limits, and type text */
+    [data-testid="stFileUploadDropzone"] button,
+    [data-testid="stFileUploadDropzone"] p,
+    [data-testid="stFileUploadDropzone"] span,
+    [data-testid="stFileUploadDropzone"] div {
+        color: #FFFFFF !important; /* This forces ALL text inside to be pure white */
         cursor: pointer !important;
     }
+    
+    /* Also ensure the uploader's dynamic label above is styled for visibility */
     div[data-testid="stFileUploader"] label {
-        color: #0F172A !important; 
+        color: #1E293B !important; /* Dark label above the dark input area */
+        font-weight: 500;
+        cursor: default !important;
     }
     
     /* FIX 4: FORCE ALL BUTTONS AND THEIR TEXT TO BE VISIBLE */
@@ -159,7 +168,7 @@ def get_hospital_recommendation(scan_type, district):
         },
         "Dental X-Ray": {
             "Chennai": "Saveetha Dental College / Balaji Dental Hospital",
-            "Madurai": "CSI College of Dental Sciences / Vasan Dental Care",
+            "Madurai": "C CSI College of Dental Sciences / Vasan Dental Care",
             "Coimbatore": "Sri Ramakrishna Dental College",
             "Virudhunagar": "Local District Govt Hospital Dental Wing",
             "Trichy": "KAPV Govt Medical College Dental Wing"
