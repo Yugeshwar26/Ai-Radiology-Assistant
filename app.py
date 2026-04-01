@@ -74,32 +74,39 @@ st.markdown("""
         line-height: 1.6;
     }
     
-    /* NEW FIX 6: Darkened File Uploader with Pure White Text (as requested) */
+    /* NEW FIX 6: Fully White Text for the File Uploader */
     div[data-testid="stFileUploader"] {
-        background-color: #212534 !important; /* Dark background from image example */
-        border: 1px solid #4B5563 !important; /* Subtler dark border */
+        background-color: #212534 !important; /* Dark background */
+        border: 1px solid #4B5563 !important; 
         border-radius: 16px;
-        padding: 15px; /* Closer fit */
-        cursor: pointer !important; 
+        padding: 15px; 
     }
     
-    /* Specific text targeting for the Upload, Limits, and type text */
-    [data-testid="stFileUploadDropzone"] button,
-    [data-testid="stFileUploadDropzone"] p,
-    [data-testid="stFileUploadDropzone"] span,
-    [data-testid="stFileUploadDropzone"] div {
-        color: #FFFFFF !important; /* This forces ALL text inside to be pure white */
-        cursor: pointer !important;
-    }
-    
-    /* Also ensure the uploader's dynamic label above is styled for visibility */
-    div[data-testid="stFileUploader"] label {
-        color: #1E293B !important; /* Dark label above the dark input area */
+    /* Force the main label ("Drop patient's Chest X-Ray...") to be pure white */
+    div[data-testid="stFileUploader"] > label,
+    div[data-testid="stFileUploader"] > label * {
+        color: #FFFFFF !important;
         font-weight: 500;
         cursor: default !important;
     }
     
-    /* FIX 4: FORCE ALL BUTTONS AND THEIR TEXT TO BE VISIBLE */
+    /* Force ALL text, spans, and SVG icons inside the dropzone to be white */
+    [data-testid="stFileUploadDropzone"] * {
+        color: #FFFFFF !important; 
+        fill: #FFFFFF !important; /* Fixes the upload icon color */
+        cursor: pointer !important;
+    }
+
+    /* Make the upload button border slightly visible against the dark background */
+    [data-testid="stFileUploadDropzone"] button {
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    }
+    [data-testid="stFileUploadDropzone"] button:hover {
+        border: 1px solid rgba(255, 255, 255, 0.8) !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* FIX 4: FORCE ALL MAIN BUTTONS AND THEIR TEXT TO BE VISIBLE */
     div.stButton > button {
         background-color: #2563EB !important;
         color: #FFFFFF !important;
@@ -111,7 +118,7 @@ st.markdown("""
         box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3) !important;
         transition: all 0.3s ease !important;
         width: 100% !important;
-        cursor: pointer !important; /* Keep hand pointer for buttons */
+        cursor: pointer !important; 
     }
     div.stButton > button * {
         color: #FFFFFF !important;
@@ -168,7 +175,7 @@ def get_hospital_recommendation(scan_type, district):
         },
         "Dental X-Ray": {
             "Chennai": "Saveetha Dental College / Balaji Dental Hospital",
-            "Madurai": "C CSI College of Dental Sciences / Vasan Dental Care",
+            "Madurai": "CSI College of Dental Sciences / Vasan Dental Care",
             "Coimbatore": "Sri Ramakrishna Dental College",
             "Virudhunagar": "Local District Govt Hospital Dental Wing",
             "Trichy": "KAPV Govt Medical College Dental Wing"
