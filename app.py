@@ -7,7 +7,7 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="AI Radiology Assistant", page_icon="🩺", layout="wide", initial_sidebar_state="expanded")
 
-# 2. CLEAN SAAS UI CSS INJECTION (With the Ultimate Button Fix)
+# 2. CLEAN SAAS UI CSS INJECTION (With the Ultimate Button & Cursor Fix)
 st.markdown("""
     <style>
     /* Clean, modern typography */
@@ -15,6 +15,16 @@ st.markdown("""
     
     html, body, [class*="css"]  {
         font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* FIX 5: Force Default Cursor (Arrow) on text elements like titles and labels */
+    h1, h2, h3, h4, h5, h6, p, label, span {
+        cursor: default !important;
+    }
+    
+    /* Ensure actual text inputs still get the text cursor */
+    input[type="text"] {
+        cursor: text !important;
     }
 
     /* Hide Streamlit Branding */
@@ -70,9 +80,11 @@ st.markdown("""
         border: 2px dashed #94A3B8 !important;
         border-radius: 16px;
         padding: 30px !important;
+        cursor: pointer !important; /* Keep pointer for dropzone */
     }
     [data-testid="stFileUploadDropzone"] * {
         color: #1E293B !important; 
+        cursor: pointer !important;
     }
     div[data-testid="stFileUploader"] label {
         color: #0F172A !important; 
@@ -90,9 +102,11 @@ st.markdown("""
         box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3) !important;
         transition: all 0.3s ease !important;
         width: 100% !important;
+        cursor: pointer !important; /* Keep hand pointer for buttons */
     }
     div.stButton > button * {
-        color: #FFFFFF !important; /* This forces the text inside to be pure white */
+        color: #FFFFFF !important;
+        cursor: pointer !important;
     }
     div.stButton > button:hover {
         transform: translateY(-2px) !important;
@@ -220,7 +234,7 @@ if uploaded_file is not None:
                         Line 2: TRIAGE_LEVEL: [RED, YELLOW, or GREEN] 
                         (Rule: RED = Brain Abnormality, Tuberculosis, or Fracture. YELLOW = Pneumonia or Dental Anomaly. GREEN = Normal).
 
-                        After these two lines, provide the response in TWO distinct sections:
+                       After these two lines, provide the response in TWO distinct sections:
                         ### SECTION 1: PROFESSIONAL MEDICAL REPORT
                         - Clinical Indication: Preliminary screening and triage.
                         - Technical Findings: Provide a detailed anatomical analysis ({technical_focus}).
