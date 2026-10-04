@@ -91,19 +91,28 @@ st.markdown("""
     }
     
     /* Force ALL text, spans, and SVG icons inside the dropzone to be white */
+    /* Force ALL text, spans, and SVG icons inside the dropzone to be white */
     [data-testid="stFileUploadDropzone"] * {
         color: #FFFFFF !important; 
         fill: #FFFFFF !important; /* Fixes the upload icon color */
         cursor: pointer !important;
     }
 
-    /* Make the upload button border slightly visible against the dark background */
+    /* Make the upload button border slightly visible and force text to be white */
     [data-testid="stFileUploadDropzone"] button {
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #FFFFFF !important; /* Forces button text to white */
     }
+    
+    /* Target nested spans/text inside the upload button to ensure white color */
+    [data-testid="stFileUploadDropzone"] button * {
+        color: #FFFFFF !important;
+    }
+
     [data-testid="stFileUploadDropzone"] button:hover {
         border: 1px solid rgba(255, 255, 255, 0.8) !important;
         background-color: rgba(255, 255, 255, 0.1) !important;
+        color: #FFFFFF !important;
     }
     
     /* FIX 4: FORCE ALL MAIN BUTTONS AND THEIR TEXT TO BE VISIBLE */
